@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import org.bson.BsonArray;
 import org.bson.BsonDocument;
+import org.bson.BsonType;
 import org.bson.BsonValue;
 
 import com.mongodb.client.model.Filters;
@@ -51,8 +52,10 @@ public class CustomWriteModelStrategy implements WriteModelStrategy {
 				} else if (value.isArray()) {
 					BsonValue removeed = removeEmptyFields(value.asArray());
 					ret.append(key, removeed);
-					;
-				} else if (!value.asString().getValue().isEmpty()) {
+
+				} else if ((value.getBsonType().equals(BsonType.STRING) && !value.asString().getValue().isEmpty())) {
+					ret.append(key, value);
+				} else if (!value.getBsonType().equals(BsonType.STRING)) {
 					ret.append(key, value);
 				}
 			}
@@ -81,7 +84,9 @@ public class CustomWriteModelStrategy implements WriteModelStrategy {
 				} else if (value.isDocument()) {
 					BsonValue removeed = removeEmptyFields(value.asDocument());
 					ret.add(removeed);
-				} else if (!value.asString().getValue().isEmpty()) {
+				} else if ((value.getBsonType().equals(BsonType.STRING) && !value.asString().getValue().isEmpty())) {
+					ret.add(value);
+				} else if (!value.getBsonType().equals(BsonType.STRING)) {
 					ret.add(value);
 				}
 			}
